@@ -41,7 +41,7 @@ function register_routes()
 
 }
 
-/** Удаление плангина */
+/** Удаление плагина */
 function uninstall_direct_credit_wp()
 {
     require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp-uninstall.php';

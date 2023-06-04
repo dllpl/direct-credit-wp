@@ -32,7 +32,8 @@ class Direct_Credit_WP_Uninstall
     public static function uninstall()
     {
         global $wpdb;
-        $wpdb->query('DROP TABLE IF EXISTS ' . $wpdb->prefix . 'direct_credit');
+        $wpdb->query('DROP TABLE IF EXISTS ' . $wpdb->prefix . 'direct_credit_options');
+        $wpdb->query('DROP TABLE IF EXISTS ' . $wpdb->prefix . 'direct_credit_orders');
     }
 
 }

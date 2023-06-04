@@ -31,11 +31,14 @@ class Direct_Credit_WP_Activator
      */
     public static function activate()
     {
-        /** Создание таблицы для опций */
+        /** Создание таблиц опций и заявок */
         global $wpdb;
-        $table_name = $wpdb->prefix . 'direct_credit_options';
+        $table_options = $wpdb->prefix . 'direct_credit_options';
+        $table_orders = $wpdb->prefix . 'direct_credit_orders';
         $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
+
+        $sql = ["
+            CREATE TABLE $table_options (
             `id` INT NOT NULL AUTO_INCREMENT,
             `login` VARCHAR(255) DEFAULT NULL,
             `password` VARCHAR(255) DEFAULT NULL,
@@ -43,25 +46,18 @@ class Direct_Credit_WP_Activator
             `location` VARCHAR(255) DEFAULT NULL,
             `created_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-
-        /** Создание таблицы для заявок */
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'direct_credit_requests';
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
+        ) $charset_collate
+        ", "
+            CREATE TABLE $table_orders (
             `id` INT NOT NULL AUTO_INCREMENT,
             `order_id` VARCHAR(255) DEFAULT NULL,
             `dc_token` VARCHAR(255) DEFAULT NULL,
             `address` VARCHAR(255) DEFAULT NULL,
-            `status` INT DEFAULT NULL,
-            `json` VARCHAR(max) DEFAULT NULL,
+            `dc_status` INT DEFAULT NULL,
+            `json` JSON DEFAULT NULL,
             `created_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)
-        ) $charset_collate;";
+        ) $charset_collate"];
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
