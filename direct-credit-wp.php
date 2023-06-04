@@ -21,9 +21,18 @@ if (!defined('WPINC')) {
 }
 
 add_action('rest_api_init', 'register_routes');
+add_action('admin_menu', 'admin_menu_direct_credit_wp');
 
 register_activation_hook(__FILE__, 'activate_direct_credit_wp');
 register_uninstall_hook(__FILE__, 'uninstall_direct_credit_wp');
+
+/** Добавление ссылки на настройки плагина */
+function admin_menu_direct_credit_wp()
+{
+    require_once plugin_dir_path(__FILE__) . 'admin/class-option-page.php';
+    $option = new OptionPage();
+    $option->addMenu();
+}
 
 /** Активация плагина */
 function activate_direct_credit_wp()
@@ -38,7 +47,6 @@ function register_routes()
     require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp.php';
     $controller = new MainRestController();
     $controller->registerRoutes();
-
 }
 
 /** Удаление плагина */
