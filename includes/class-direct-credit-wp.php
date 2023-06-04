@@ -26,193 +26,97 @@
  * @subpackage Direct_Credit_WP/includes
  * @author     Nikita Ivanov (Nick Iv)
  */
-class Direct_Credit_WP {
+class MainRestController extends WP_REST_Controller
+{
+    private string $login;
+    private string $password;
+    private string $wsdl;
+    private string $location;
 
-	/**
-	 * The loader that's responsible for maintaining and registering all hooks that power
-	 * the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      Direct_Credit_WP_Loader    $loader    Maintains and registers all hooks for the plugin.
-	 */
-	protected $loader;
+    private $soapClient;
 
-	/**
-	 * The unique identifier of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $direct_credit_wp    The string used to uniquely identify this plugin.
-	 */
-	protected $direct_credit_wp;
+    const NAMESPACE = 'dc/v1';
 
-	/**
-	 * The current version of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
-	 */
-	protected $version;
+    public function __construct()
+    {
+        if ($this->getOptions()) {
+            $this->soapClient = $this->soapInit();
+        }
+    }
 
-	/**
-	 * Define the core functionality of the plugin.
-	 *
-	 * Set the plugin name and the plugin version that can be used throughout the plugin.
-	 * Load the dependencies, define the locale, and set the hooks for the admin area and
-	 * the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function __construct() {
-		if ( defined( 'DIRECT_CREDIT_WP_VERSION' ) ) {
-			$this->version = DIRECT_CREDIT_WP_VERSION;
-		} else {
-			$this->version = '1.0.0';
-		}
-		$this->direct_credit_wp = 'direct-credit-wp';
+    public function registerRoutes()
+    {
+        register_rest_route(self::NAMESPACE, 'createOrder', [
+            'methods' => 'POST',
+            'callback' => [$this, 'createOrder'],
+            'permission_callback' => false,
+        ]);
+        register_rest_route(self::NAMESPACE, 'checkStatus', [
+            'args' => [
+                'order_id' => [
+                    'description' => __('Поле order_id обязательно к заполнению.'),
+                    'type' => 'string',
+                    'required' => true,
+                ],
+            ],
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'checkStatus'],
+                'permission_callback' => false,
+            ],
+            [
+                'methods' => 'POST',
+                'callback' => [$this, 'checkStatus'],
+                'permission_callback' => false,
+            ],
+        ]);
+    }
 
-		$this->load_dependencies();
-		$this->set_locale();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
 
-	}
+    private function createOrder(WP_REST_Request $request)
+    {
+        var_dump($request);
+    }
 
-	/**
-	 * Load the required dependencies for this plugin.
-	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Direct_Credit_WP_Loader. Orchestrates the hooks of the plugin.
-	 * - Direct_Credit_WP_i18n. Defines internationalization functionality.
-	 * - Direct_Credit_WP_Admin. Defines all hooks for the admin area.
-	 * - Direct_Credit_WP_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function load_dependencies() {
+    private function checkStatus(WP_REST_Request $request)
+    {
+        var_dump($request);
+    }
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-direct-credit-wp-loader.php';
+    private function soapInit()
+    {
+        try {
+            return new SoapClient($this->wsdl,
+                [
+                    "soap_version" => SOAP_1_1,
+                    "location" => $this->location,
+                    "login" => $this->login,
+                    "password" => $this->password,
+                    "trace" => 1
+                ]);
+        } catch (SoapFault $e) {
+            return false;
+        }
+    }
 
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-direct-credit-wp-i18n.php';
+    private function getOptions()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'direct_credit_options';
 
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-direct-credit-wp-admin.php';
+        $rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM " . $table_name . " WHERE id = 1"));
 
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-direct-credit-wp-public.php';
-
-		$this->loader = new Direct_Credit_WP_Loader();
-
-	}
-
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the Direct_Credit_WP_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function set_locale() {
-
-		$plugin_i18n = new Direct_Credit_WP_i18n();
-
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
-	}
-
-	/**
-	 * Register all of the hooks related to the admin area functionality
-	 * of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function define_admin_hooks() {
-
-		$plugin_admin = new Direct_Credit_WP_Admin( $this->get_direct_credit_wp(), $this->get_version() );
-
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-        $this->loader->add_action('admin_menu', $plugin_admin, 'true_top_menu_page');
-
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = new Direct_Credit_WP_Public( $this->get_direct_credit_wp(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
-	}
-
-	/**
-	 * Run the loader to execute all of the hooks with WordPress.
-	 *
-	 * @since    1.0.0
-	 */
-	public function run() {
-		$this->loader->run();
-	}
-
-	/**
-	 * The name of the plugin used to uniquely identify it within the context of
-	 * WordPress and to define internationalization functionality.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The name of the plugin.
-	 */
-	public function get_direct_credit_wp() {
-		return $this->direct_credit_wp;
-	}
-
-	/**
-	 * The reference to the class that orchestrates the hooks with the plugin.
-	 *
-	 * @since     1.0.0
-	 * @return    Direct_Credit_WP_Loader    Orchestrates the hooks of the plugin.
-	 */
-	public function get_loader() {
-		return $this->loader;
-	}
-
-	/**
-	 * Retrieve the version number of the plugin.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function get_version() {
-		return $this->version;
-	}
+        if (!count($rows)) {
+            foreach ($rows as $row) {
+                $this->login = $row->login;
+                $this->password = $row->password;
+                $this->wsdl = $row->wsdl;
+                $this->location = $row->location;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

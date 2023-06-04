@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @since             1.0.0
  * @package           Direct_Credit_WP
@@ -14,61 +13,37 @@
  * License:           BSD 3-Clause License
  * License URI:       https://github.com/dllpl/direct-credit-wp/blob/main/LICENSE
  * Text Domain:       direct-credit-wp
- * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if (!defined('WPINC')) {
+    die;
 }
 
-/**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Update it as you release new versions.
- */
-define( 'DIRECT_CREDIT_WP_VERSION', '1.0.0' );
+add_action('rest_api_init', 'register_routes');
 
-/**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-direct-credit-wp-activator.php
- */
-function activate_direct_credit_wp() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-direct-credit-wp-activator.php';
-	Direct_Credit_WP_Activator::activate();
+register_activation_hook(__FILE__, 'activate_direct_credit_wp');
+register_uninstall_hook(__FILE__, 'uninstall_direct_credit_wp');
+
+/** Активация плагина */
+function activate_direct_credit_wp()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp-activator.php';
+    Direct_Credit_WP_Activator::activate();
 }
 
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-direct-credit-wp-deactivator.php
- */
-function deactivate_direct_credit_wp() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-direct-credit-wp-deactivator.php';
-	Direct_Credit_WP_Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'activate_direct_credit_wp' );
-register_deactivation_hook( __FILE__, 'deactivate_direct_credit_wp' );
-
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-direct-credit-wp.php';
-
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
-function run_direct_credit_wp() {
-
-	$plugin = new Direct_Credit_WP();
-	$plugin->run();
+/** Регистрация REST API методов плагина */
+function register_routes()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp.php';
+    $controller = new MainRestController();
+    $controller->registerRoutes();
 
 }
-run_direct_credit_wp();
+
+/** Удаление плангина */
+function uninstall_direct_credit_wp()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp-uninstall.php';
+    Direct_Credit_WP_Uninstall::uninstall();
+}
