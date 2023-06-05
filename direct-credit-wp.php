@@ -29,7 +29,7 @@ register_uninstall_hook(__FILE__, 'uninstall_direct_credit_wp');
 /** Добавление ссылки на настройки плагина */
 function admin_menu_direct_credit_wp()
 {
-    require_once plugin_dir_path(__FILE__) . 'admin/class-option-page.php';
+    require_once plugin_dir_path(__FILE__) . 'admin/OptionController.php';
     $option = new OptionPage();
     $option->addMenu();
 }
@@ -37,14 +37,14 @@ function admin_menu_direct_credit_wp()
 /** Активация плагина */
 function activate_direct_credit_wp()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp-activator.php';
-    Direct_Credit_WP_Activator::activate();
+    require_once plugin_dir_path(__FILE__) . 'includes/Activator.php';
+    Activator::activate();
 }
 
 /** Регистрация REST API методов плагина */
 function register_routes()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp.php';
+    require_once plugin_dir_path(__FILE__) . 'includes/Controllers/MainRequestController.php';
     $controller = new MainRestController();
     $controller->registerRoutes();
 }
@@ -52,6 +52,6 @@ function register_routes()
 /** Удаление плагина */
 function uninstall_direct_credit_wp()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-direct-credit-wp-uninstall.php';
-    Direct_Credit_WP_Uninstall::uninstall();
+    require_once plugin_dir_path(__FILE__) . 'includes/Uninstall.php';
+    Uninstall::uninstall();
 }

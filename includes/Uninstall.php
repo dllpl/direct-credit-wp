@@ -19,7 +19,7 @@
  * @subpackage Direct_Credit_WP/includes
  * @author     Nikita Ivanov (Nick Iv)
  */
-class Direct_Credit_WP_Uninstall
+class Uninstall
 {
 
     /**

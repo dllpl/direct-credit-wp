@@ -26,26 +26,36 @@
  * @subpackage Direct_Credit_WP/includes
  * @author     Nikita Ivanov (Nick Iv)
  */
+
+require_once plugin_dir_path(__FILE__) . '../Traits/Options.php';
+require_once plugin_dir_path(__FILE__) . '../Traits/Soap.php';
+
 class MainRestController extends WP_REST_Controller
 {
-    private string $login;
-    private string $password;
-    private string $wsdl;
-    private string $location;
+    use Options, Soap;
 
-    private $soapClient;
+    private \SoapClient $soapClient;
 
     const NAMESPACE = 'dc/v1';
 
     public function __construct()
     {
-        if ($this->getOptions()) {
-            $this->soapClient = $this->soapInit();
+        $options = Options::getOptions();
+        if ($options && is_array($options)) {
+            $soapClient = Soap::initClient($options);
+            if ($soapClient) {
+                $this->soapClient = $soapClient;
+            } else {
+                return wp_send_json_error('Ошибка при инициализации Soap клиента. Проверьте правильность данных');
+            }
+        } else {
+            return wp_send_json_error('Не указаны, либо не были найдены настройки Soap клиента');
         }
     }
 
     public function registerRoutes()
     {
+        /** Методы для внешних пользователей */
         register_rest_route(self::NAMESPACE, 'createOrder', [
             'methods' => 'POST',
             'callback' => [$this, 'createOrder'],
@@ -70,6 +80,8 @@ class MainRestController extends WP_REST_Controller
                 'permission_callback' => '__return_true',
             ],
         ]);
+
+        /** Методы админки */
         register_rest_route(self::NAMESPACE, 'updateSettings', [
             'methods' => 'POST',
             'callback' => [$this, 'updateSettings'],
@@ -82,59 +94,20 @@ class MainRestController extends WP_REST_Controller
 
     public function createOrder(WP_REST_Request $request)
     {
-        require_once plugin_dir_path(__FILE__) . './order/class-order.php';
-        Order::createOrder($request, $this->soapClient);
-
+        require_once plugin_dir_path(__FILE__) . 'OrderController.php';
+        OrderController::createOrder($request, $this->soapClient);
     }
 
     public function checkStatus(WP_REST_Request $request)
     {
-        require_once plugin_dir_path(__FILE__) . './order/class-order.php';
-        Order::checkStatus($request, $this->soapClient);
+        require_once plugin_dir_path(__FILE__) . 'OrderController.php';
+        OrderController::checkStatus($request, $this->soapClient);
     }
 
     public function updateSettings(WP_REST_Request $request)
     {
-        require_once plugin_dir_path(__FILE__) . 'admin/class-option-page.php';
+        require_once plugin_dir_path(__FILE__) . 'admin/OptionController.php';
         $optionPage = new OptionPage();
         $optionPage->updateSettings($request);
-
     }
-
-    private function soapInit()
-    {
-        try {
-            return new SoapClient($this->wsdl,
-                [
-                    "soap_version" => SOAP_1_1,
-                    "location" => $this->location,
-                    "login" => $this->login,
-                    "password" => $this->password,
-                    "trace" => 1
-                ]);
-        } catch (SoapFault $e) {
-            return false;
-        }
-    }
-
-    private function getOptions()
-    {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'direct_credit_options';
-
-        $rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM " . $table_name . " WHERE id = 1"));
-
-        if (count($rows)) {
-            foreach ($rows as $row) {
-                $this->login = $row->login;
-                $this->password = $row->password;
-                $this->wsdl = $row->wsdl;
-                $this->location = $row->location;
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 }
