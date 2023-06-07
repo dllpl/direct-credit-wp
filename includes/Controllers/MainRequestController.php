@@ -27,31 +27,9 @@
  * @author     Nikita Ivanov (Nick Iv)
  */
 
-require_once plugin_dir_path(__FILE__) . '../Traits/Options.php';
-require_once plugin_dir_path(__FILE__) . '../Traits/Soap.php';
-
 class MainRestController extends WP_REST_Controller
 {
-    use Options, Soap;
-
-    private \SoapClient $soapClient;
-
     const NAMESPACE = 'dc/v1';
-
-    public function __construct()
-    {
-        $options = Options::getOptions();
-        if ($options && is_array($options)) {
-            $soapClient = Soap::initClient($options);
-            if ($soapClient) {
-                $this->soapClient = $soapClient;
-            } else {
-                return wp_send_json_error('Ошибка при инициализации Soap клиента. Проверьте правильность данных');
-            }
-        } else {
-            return wp_send_json_error('Не указаны, либо не были найдены настройки Soap клиента');
-        }
-    }
 
     public function registerRoutes()
     {
@@ -95,19 +73,25 @@ class MainRestController extends WP_REST_Controller
     public function createOrder(WP_REST_Request $request)
     {
         require_once plugin_dir_path(__FILE__) . 'OrderController.php';
-        OrderController::createOrder($request, $this->soapClient);
+
+        $orderController = new OrderController();
+        $orderController->createOrder($request);
+        return OrderController::createOrder($request);
     }
 
     public function checkStatus(WP_REST_Request $request)
     {
         require_once plugin_dir_path(__FILE__) . 'OrderController.php';
-        OrderController::checkStatus($request, $this->soapClient);
+
+        $orderController = new OrderController();
+        return $orderController->checkStatus($request);
     }
 
     public function updateSettings(WP_REST_Request $request)
     {
-        require_once plugin_dir_path(__FILE__) . 'admin/OptionController.php';
+        require_once plugin_dir_path(__FILE__) . '../../admin/OptionController.php';
+
         $optionPage = new OptionPage();
-        $optionPage->updateSettings($request);
+        return $optionPage->updateSettings($request);
     }
 }
