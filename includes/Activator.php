@@ -55,12 +55,15 @@ class Activator
         ", "
             CREATE TABLE $table_orders (
             `id` INT NOT NULL AUTO_INCREMENT,
-            `order_id` VARCHAR(255) DEFAULT NULL,
+            `order_id` VARCHAR(255) NOT NULL,
             `dc_token` VARCHAR(255) DEFAULT NULL,
-            `address` VARCHAR(255) DEFAULT NULL,
+            `phone` VARCHAR(255) NOT NULL,
+            `item_name` VARCHAR(255) NOT NULL,
+            `price` DOUBLE NOT NULL
             `dc_status` INT DEFAULT NULL,
-            `json` JSON DEFAULT NULL,
+            `json` JSON NOT NULL,
             `created_at` DATETIME DEFAULT NOW(),
+            `updated_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)
         ) $charset_collate"];
 

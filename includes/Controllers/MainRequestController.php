@@ -38,6 +38,24 @@ class MainRestController extends WP_REST_Controller
             'methods' => 'POST',
             'callback' => [$this, 'createOrder'],
             'permission_callback' => '__return_true',
+            'args' => [
+                'phone'=> [
+                    'description' => __('Поле phone обязательно к заполнению в формате 79000000000.'),
+                    'type' => 'string',
+                    'pattern' => '^7+\d{10}$',
+                    'required' => true,
+                ],
+                'item_name'=>[
+                    'description' => __('Поле item_name обязательно к заполнению.'),
+                    'type' => 'string',
+                    'required' => true,
+                ],
+                'price' => [
+                    'description' => __('Поле price обязательно к заполнению.'),
+                    'type' => 'number',
+                    'required' => true,
+                ]
+            ]
         ]);
         register_rest_route(self::NAMESPACE, 'checkStatus', [
             'args' => [
