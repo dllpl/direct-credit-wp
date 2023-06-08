@@ -30,17 +30,32 @@ class OptionPage
         <div class="wrap">
             <h2><?php echo get_admin_page_title() ?></h2>
             <form>
-                <label for="location">Location:</label> <br>
-                <input type="text" id="location" name="location" value="<?php $options['location'] ?? null ?>"><br>
+                <label for="login">Login<span style="color: red">*</span></label> <br>
+                <input type="text" id="login" name="login" value="<?php echo $options['login'] ?? null ?>" required><br>
+                <label for="password">Password<span style="color: red">*</span></label> <br>
+                <input type="password" id="password" name="password" value="<?php echo $options['password'] ?? null ?>" required><br>
 
-                <label for="wsdl">WSDL:</label> <br>
-                <input type="text" id="wsdl" name="wsdl" value="<?php $options['wsdl'] ?? null ?>"><br>
+                <hr>
 
-                <label for="password">Password:</label> <br>
-                <input type="password" id="password" name="password" value="<?php $options['password'] ?? null ?>"><br>
+                <label for="partnerID">partnerID<span style="color: red">*</span></label> <br>
+                <input type="text" id="partnerID" name="partnerID" value="<?php echo $options['partnerID'] ?? null ?>" required><br>
+                <label for="codeTT">codeTT<span style="color: red">*</span></label> <br>
+                <input type="text" id="codeTT" name="codeTT" value="<?php echo $options['codeTT'] ?? null ?>" required><br>
 
-                <label for="login">Login:</label> <br>
-                <input type="text" id="login" name="login" value="<?php $options['login'] ?? null ?>"><br>
+                <hr>
+
+                <label for="wsdl">WSDL<span style="color: red">*</span></label> <br>
+                <input type="text" id="wsdl" name="wsdl" value="<?php echo $options['wsdl'] ?? null ?>" required><br>
+                <label for="location">Location<span style="color: red">*</span></label> <br>
+                <input type="text" id="location" name="location" value="<?php echo $options['location'] ?? null ?>" required><br>
+
+                <hr>
+
+                <label for="email">Email (оставьте пустым, если не хотите использовать отправку на почту)</label> <br>
+                <input type="email" id="email" name="email" value="<?php echo $options['email'] ?? null ?>"><br>
+                <label for="bitrix_webhook_url">bitrix_webhook_url (оставьте пустым, если не хотите интегрировать с битрикс24)</label> <br>
+                <input type="text" id="bitrix_webhook_url" name="bitrix_webhook_url" value="<?php echo $options['bitrix_webhook_url'] ?? null ?>"><br>
+
                 <div style="color: red" id="error"></div>
                 <div style="color: forestgreen" id="success"></div>
                 <?php
@@ -54,38 +69,67 @@ class OptionPage
                 form.addEventListener('submit', (event) => {
                     event.preventDefault();
                     const formData = new FormData(form);
+                    const data = {};
+                    for (const [key, value] of formData.entries()) {
+                        if(value === '') continue
+                        data[key] = value;
+                    }
                     fetch(url, {
                         method: 'POST',
-                        body: formData,
                         headers: {
-                            'X-WP-Nonce': wpApiSettings.nonce
-                        }
+                            'X-WP-Nonce':  wpApiSettings.nonce,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
                     })
                         .then(response => response.json())
                         .then(data => {
                             if (!data.success) {
-                                document.getElementById('error').innerText = data.data
+                                document.getElementById('error').innerText = data?.message ?? data.data
                             } else {
                                 document.getElementById('success').innerText = data.data
                             }
                         })
                         .catch(error => {
-                            document.getElementById('error').innerText = error.data
+                            document.getElementById('error').innerText = error.data.message
                         })
                         .finally(() => {
                             setTimeout(() => {
                                 document.getElementById('error').innerText = ''
                                 document.getElementById('success').innerText = ''
-                            }, 2000)
+                            }, 5000)
                         })
                 });
             </script>
+            <style>
+                input{width: 400px;}
+            </style>
         </div>
         <?php
     }
 
-    public function updateSettings()
+    public function updateSettings($request)
     {
-        return wp_send_json_success('Успешное обновление');
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'direct_credit_options';
+
+        $data = [
+            'wsdl' => $request['wsdl'],
+            'login' => $request['login'],
+            'password' => $request['password'],
+            'location' => $request['location'],
+            'email' => $request['email'] ?? null,
+            'bitrix_webhook_url' => $request['bitrix_webhook_url'] ?? null,
+            'codeTT' => $request['codeTT'],
+            'partnerID' => $request['partnerID']
+        ];
+
+        $result = $wpdb->insert($table_name, $data);
+
+        if ($result) {
+            return wp_send_json_success('Успешное обновление');
+        } else {
+            return wp_send_json_error('Ошибка при обновлении данных');
+        }
     }
 }

@@ -41,10 +41,14 @@ class Activator
         $sql = ["
             CREATE TABLE $table_options (
             `id` INT NOT NULL AUTO_INCREMENT,
-            `login` VARCHAR(255) DEFAULT NULL,
-            `password` VARCHAR(255) DEFAULT NULL,
-            `wsdl` VARCHAR(255) DEFAULT NULL,
-            `location` VARCHAR(255) DEFAULT NULL,
+            `partnerID` VARCHAR(255) NOT NULL,
+            `codeTT` VARCHAR(255) NOT NULL,
+            `login` VARCHAR(255) NOT NULL,
+            `password` VARCHAR(255) NOT NULL,
+            `wsdl` VARCHAR(255) NOT NULL,
+            `location` VARCHAR(255) NOT NULL,
+            `bitrix_webhook_url` VARCHAR(255) DEFAULT NULL,
+            `email` VARCHAR(255) DEFAULT NULL,
             `created_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)
         ) $charset_collate

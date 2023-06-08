@@ -66,6 +66,56 @@ class MainRestController extends WP_REST_Controller
             'permission_callback' => function () {
                 return current_user_can('manage_options');
             },
+            'args' => [
+                'location' => [
+                    'description' => __('Поле location обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'wsdl' => [
+                    'description' => __('Поле wsdl обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'password' => [
+                    'description' => __('Поле password обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'login' => [
+                    'description' => __('Поле login обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'partnerID' => [
+                    'description' => __('Поле partnerID обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'codeTT' => [
+                    'description' => __('Поле codeTT обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'bitrix_webhook_url' => [
+                    'description' => __('Поле bitrix_webhook_url обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'default' => null
+                ],
+                'email' => [
+                    'description' => __('Поле email обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'default' => null
+                ]
+            ],
         ]);
     }
 
@@ -75,8 +125,7 @@ class MainRestController extends WP_REST_Controller
         require_once plugin_dir_path(__FILE__) . 'OrderController.php';
 
         $orderController = new OrderController();
-        $orderController->createOrder($request);
-        return OrderController::createOrder($request);
+        return $orderController->createOrder($request);
     }
 
     public function checkStatus(WP_REST_Request $request)
