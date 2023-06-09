@@ -15,7 +15,6 @@
  * Text Domain:       direct-credit-wp
  */
 
-// If this file is called directly, abort.
 if (!defined('WPINC')) {
     die;
 }

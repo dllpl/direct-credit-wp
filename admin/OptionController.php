@@ -44,17 +44,19 @@ class OptionPage
 
                 <hr>
 
-                <label for="wsdl">WSDL<span style="color: red">*</span></label> <br>
-                <input type="text" id="wsdl" name="wsdl" value="<?php echo $options['wsdl'] ?? null ?>" required><br>
-                <label for="location">Location<span style="color: red">*</span></label> <br>
-                <input type="text" id="location" name="location" value="<?php echo $options['location'] ?? null ?>" required><br>
+                <label for="wsdl">WSDL (URL)<span style="color: red">*</span></label> <br>
+                <input type="url" pattern="https://.*" id="wsdl" name="wsdl" value="<?php echo $options['wsdl'] ?? null ?>" required><br>
+                <label for="location">Location (URL)<span style="color: red">*</span></label> <br>
+                <input type="url" pattern="https://.*" placeholder="" id="location" name="location" value="<?php echo $options['location'] ?? null ?>" required><br>
 
                 <hr>
 
                 <label for="email">Email (оставьте пустым, если не хотите использовать отправку на почту)</label> <br>
                 <input type="email" id="email" name="email" value="<?php echo $options['email'] ?? null ?>"><br>
-                <label for="bitrix_webhook_url">bitrix_webhook_url (оставьте пустым, если не хотите интегрировать с битрикс24)</label> <br>
-                <input type="text" id="bitrix_webhook_url" name="bitrix_webhook_url" value="<?php echo $options['bitrix_webhook_url'] ?? null ?>"><br>
+                <label for="bitrix_webhook_url">Битрикс24 API URL (оставьте пустым, если не хотите интегрировать с битрикс24)</label> <br>
+                <input type="url" placeholder="Пример: https://{domain}.bitrix24.ru/rest/{user}/{key}" pattern="https://.*" id="bitrix_webhook_url" name="bitrix_webhook_url" value="<?php echo $options['bitrix_webhook_url'] ?? null ?>"><br>
+                <label for="bitrix_entity_type_id">Идентификатор смарт-процесса (оставьте пустым, если не хотите создавать смарт-процесс)</label> <br>
+                <input type="number" placeholder="Числовой идентификатор" id="bitrix_entity_type_id" name="bitrix_entity_type_id" value="<?php echo $options['bitrix_entity_type_id'] ?? null ?>"><br>
 
                 <div style="color: red" id="error"></div>
                 <div style="color: forestgreen" id="success"></div>
@@ -127,9 +129,9 @@ class OptionPage
         $result = $wpdb->insert($table_name, $data);
 
         if ($result) {
-            return wp_send_json_success('Успешное обновление');
+            return wp_send_json_success('Успешное сохранение данных');
         } else {
-            return wp_send_json_error('Ошибка при обновлении данных');
+            return wp_send_json_error('Ошибка при сохранении данных');
         }
     }
 }

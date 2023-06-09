@@ -9,6 +9,7 @@ class OrderController
 
     private SoapClient $soapClient;
     private array $options;
+    private string $table_name;
 
     public function __construct()
     {
@@ -26,9 +27,13 @@ class OrderController
         }
     }
 
+    /**
+     * Метод создания заказа. Запускает остальные процессы.
+     * @param $request
+     * @return mixed
+     */
     public function createOrder($request)
     {
-
         $referrer = $_SERVER['HTTP_REFERER'];
         $parts = parse_url($referrer);
         parse_str($parts['query'], $query);
@@ -39,7 +44,7 @@ class OrderController
         $utm_content = $query['utm_content'] ?? null;
 
         $order_data = [
-            'order_id' => md5(uniqid(rand(), true)),
+            'order_id' => wp_generate_uuid4(),
             'firstName' => $request['firstName'] ?? null,
             'secondName' => $request['secondName'] ?? null,
             'lastName' => $request['lastName'] ?? null,
@@ -61,12 +66,54 @@ class OrderController
             ]
         ];
 
+        /** Отправляем в ДК */
         if ($res = $this->sendToDK($order_data)) {
-            $this->insertToBD($order_data, (int)$res[0]['status'], $res[0]['apiKey']);
-            $this->sendToBitrix($order_data, (int)$res[0]['status'], $res[0]['apiKey']);
+
+            $dc_status = (int)$res[0]['status'];
+            $dc_api_key = $res[0]['apiKey'];
+
+            $this->insertOrderToBD([
+                'order_id' => $order_data['order_id'],
+                'dc_api_key' => $dc_api_key,
+                'phone' => $order_data['phone'],
+                'item_name' => $order_data['item_name'],
+                'price' => $order_data['price'],
+                'dc_status' => $dc_status,
+                'json' => json_encode($order_data)
+            ]);
+
+            /** Если указана почта, отправляем заказ на почту */
+            if (isset($this->options['email']) && !empty($this->options['email'])) {
+                $this->sendToEmail($order_data, $dc_status);
+            }
+
+            /** Если указан вебхук Битрикс24, создаем */
+            if (isset($this->options['bitrix_webhook_url']) && !empty($this->options['bitrix_webhook_url'])) {
+
+                $lead_id = $this->bitrixCreateLead($order_data, $dc_status, $this->options['bitrix_webhook_url']);
+
+                /** Если указан Идентификатор смарт-процесса, создаем */
+                if (isset($this->options['bitrix_entity_type_id']) && !empty($this->options['bitrix_entity_type_id'])) {
+                    $sp_id = $this->bitrixCreateSP($lead_id, $dc_status, (int)$this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']);
+                }
+
+                $this->updateOrderToDB($order_data['order_id'], [
+                    'bitrix_lead_id' => $lead_id,
+                    'bitrix_sp_id' => $sp_id ?? null,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+            return wp_send_json_success($dc_api_key);
+        } else {
+            return wp_send_json_error('Ошибка при создании заявки в ДК');
         }
     }
 
+    /**
+     * Отправка в Директ Кредит и получение Api токена.
+     * @param array $order_data
+     * @return false|void
+     */
     private function sendToDK(array $order_data)
     {
         $data = [
@@ -96,46 +143,138 @@ class OrderController
             $response = $this->soapClient->createOrder(['data' => $data]);
             var_dump($response);
         } catch (SoapFault $e) {
-            return wp_send_json_error($e);
+            return false;
         }
     }
 
-    private function insertToBD(array $order_data, int $dc_status, string $dc_token)
+    /**
+     * Создание лида в Битрикс24
+     * @param array $order_data
+     * @param int $dc_status
+     * @param string $bitrix_webhook_url
+     * @return false|mixed|void
+     */
+    private function bitrixCreateLead(array $order_data, int $dc_status, string $bitrix_webhook_url)
+    {
+        $action = '/crm.lead.add.json';
+
+        $queryData = http_build_query([
+            "fields" => [
+                "TITLE" => "Кредит | " . $order_data['name'] . " | " . $order_data['address'],
+                "NAME" => $order_data['firstName'],
+                "SECOND_NAME" => $order_data['secondName'],
+                "LAST_NAME" => $order_data['lastName'],
+                "BIRTHDATE" => $order_data['birthdate'],
+                "UF_CRM_MGO_CC_ENTRY_POINT" => $order_data['url'],
+                "PHONE" => [
+                    "n0" => [
+                        "VALUE" => $order_data['phone'],
+                        "TYPE_ID" => "PHONE",
+                        "ID" => "241500",
+                        "VALUE_TYPE" => "WORK"
+                    ],
+                ],
+                "EMAIL" => [
+                    "n0" => [
+                        "VALUE" => $order_data['email'],
+                        "TYPE_ID" => "EMAIL",
+                        "ID" => "241502",
+                        "VALUE_TYPE" => "WORK"
+                    ]
+                ],
+                "UF_CRM_1676289780" => $order_data['metrikaClientId'],
+                "UF_CRM_MGO_CC_TAG_ID" => "Кредит",
+                "SOURCE_ID" => "UC_AITU1Z",
+                "ADDRESS_CITY" => $order_data['address'],
+                "UF_CRM_1683280552822" => $dc_status,
+                "UF_CRM_1683536841182" => $order_data['order_id'],
+                "UTM_SOURCE" => $order_data['utm']['utm_source'],
+                "UTM_MEDIUM" => $order_data['utm']['utm_medium'],
+                "UTM_CAMPAIGN" => $order_data['utm']['utm_campaign'],
+                "UTM_TERM" => $order_data['utm']['utm_term'],
+                "UTM_CONTENT" => $order_data['utm']['utm_content']
+            ],
+        ]);
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_POST => 1,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $bitrix_webhook_url . $action,
+            CURLOPT_POSTFIELDS => $queryData,
+        ]);
+        $result = curl_exec($curl);
+        curl_close($curl);
+        $result = json_decode($result, 1);
+
+        if (!array_key_exists('error', $result)) {
+            return (is_array($result) && !empty($result["result"])) ? $result["result"] : false;
+        }
+    }
+
+    /**
+     * Создание смарт-процесса в Битрикс24
+     * @param string $lead_id
+     * @param int $dc_status
+     * @param int $bitrix_entity_type_id
+     * @param string $bitrix_webhook_url
+     * @return false|mixed
+     */
+    private function bitrixCreateSP(string $lead_id, int $dc_status, int $bitrix_entity_type_id, string $bitrix_webhook_url)
+    {
+        $action = '/crm.item.add.json';
+
+        $queryData = http_build_query([
+            'entityTypeId' => $bitrix_entity_type_id,
+            'fields' => [
+                //TODO Заполнить начальным статусом от ДК
+            ]
+        ]);
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_POST => 1,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $bitrix_webhook_url . $action,
+            CURLOPT_POSTFIELDS => $queryData,
+        ]);
+        $result = curl_exec($curl);
+        curl_close($curl);
+        $result = json_decode($result, 1);
+
+        if (!array_key_exists('error', $result)) {
+            return (is_array($result) && !empty($result["result"]['item']['id'])) ? $result["result"]['item']['id'] : false;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Отправка на почту
+     * @param array $order_data
+     * @param int $dc_status
+     * @return void
+     */
+    private function sendToEmail(array $order_data, int $dc_status)
+    {
+
+    }
+
+    private function insertOrderToBD(array $data)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'direct_credit_orders';
-        $data = [
-            'order_id' => $order_data['order_id'],
-            'dc_token' => $dc_token,
-            'phone' => $order_data['phone'],
-            'item_name' => $order_data['item_name'],
-            'price' => $order_data['price'],
-            'dc_status' => $dc_status,
-            'json' => json_encode($order_data)
-        ];
         $wpdb->insert($table_name, $data);
     }
 
-    private function sendToBitrix(array $order_data, int $dc_status, string $dc_token)
-    {
-
-    }
-
-    private function updateOrder(string $order_id, $dc_status = null)
+    private function updateOrderToDB(string $order_id, array $data)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'direct_credit_options';
-
-        $res = $wpdb->update($table_name,
-            [
-                'dc_status' => $dc_status,
-                'updated_at' => date('Y-m-d H:i:s')],
-            [
-                'order_id' => $order_id
-            ],
-            ['%d'],
-            ['%s']
-        );
+        $res = $wpdb->update($table_name, $data, ['order_id' => $order_id]);
 
         if ($res === 0) {
 
@@ -150,7 +289,7 @@ class OrderController
         }
     }
 
-    private function getOrder(string $order_id)
+    private function getOrderFromDB(string $order_id)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'direct_credit_orders';
@@ -166,6 +305,10 @@ class OrderController
 
     public function checkStatus($request)
     {
+        if($this->getOrderFromDB($request['order_id'])) {
 
+        } else {
+            return wp_send_json_error('Не найден такой order_id', 404);
+        }
     }
 }

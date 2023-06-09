@@ -122,17 +122,23 @@ class MainRestController extends WP_REST_Controller
                     'required' => true,
                 ],
                 'bitrix_webhook_url' => [
-                    'description' => __('Поле bitrix_webhook_url обязательно к заполнению.'),
+                    'description' => __('Ошибка в поле bitrix_webhook_url'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'default' => null
+                ],
+                'bitrix_entity_type_id' => [
+                    'description' => __('Ошибка в поле bitrix_entity_type_id'),
                     'type' => 'string',
                     'minLength' => 3,
                     'default' => null
                 ],
                 'email' => [
-                    'description' => __('Поле email обязательно к заполнению.'),
+                    'description' => __('Ошибка в поле email'),
                     'type' => 'string',
                     'minLength' => 3,
                     'default' => null
-                ]
+                ],
             ],
         ]);
     }
