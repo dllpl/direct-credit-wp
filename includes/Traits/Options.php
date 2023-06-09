@@ -19,7 +19,7 @@ trait Options
                 'location' => $rows[0]->location,
                 'email' => $rows[0]->email,
                 'bitrix_webhook_url' => $rows[0]->bitrix_webhook_url,
-                'bitrix_entity_type_id' => $rows[0]->bitrix_entity_type_id,
+                'bitrix_entity_type_id' => (int) $rows[0]->bitrix_entity_type_id,
                 'codeTT'=> $rows[0]->codeTT,
                 'partnerID' => $rows[0]->partnerID,
             ];

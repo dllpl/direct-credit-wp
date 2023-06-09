@@ -122,6 +122,7 @@ class OptionPage
             'location' => $request['location'],
             'email' => $request['email'] ?? null,
             'bitrix_webhook_url' => $request['bitrix_webhook_url'] ?? null,
+            'bitrix_entity_type_id' => $request['bitrix_entity_type_id'] ?? null,
             'codeTT' => $request['codeTT'],
             'partnerID' => $request['partnerID']
         ];
