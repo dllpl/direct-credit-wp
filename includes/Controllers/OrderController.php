@@ -94,7 +94,7 @@ class OrderController
 
                 /** Если указан Идентификатор смарт-процесса, создаем */
                 if (isset($this->options['bitrix_entity_type_id']) && !empty($this->options['bitrix_entity_type_id'])) {
-                    $sp_id = $this->bitrixCreateSP($lead_id, $dc_status, (int)$this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']);
+                    $sp_id = $this->bitrixCreateSP($lead_id, $dc_status, (int)$this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url'], $order_data);
                 }
 
                 $this->updateOrderToDB($order_data['order_id'], [
@@ -140,8 +140,7 @@ class OrderController
         ];
 
         try {
-            $response = $this->soapClient->createOrder(['data' => $data]);
-            var_dump($response);
+            return $this->soapClient->createOrder(['data' => $data]);
         } catch (SoapFault $e) {
             return false;
         }
@@ -220,18 +219,62 @@ class OrderController
      * @param int $dc_status
      * @param int $bitrix_entity_type_id
      * @param string $bitrix_webhook_url
+     * @param array $order_data
      * @return false|mixed
      */
-    private function bitrixCreateSP(string $lead_id, int $dc_status, int $bitrix_entity_type_id, string $bitrix_webhook_url)
+    private function bitrixCreateSP(string $lead_id, int $dc_status, int $bitrix_entity_type_id, string $bitrix_webhook_url, array $order_data)
     {
         $action = '/crm.item.add.json';
+
+        $stage_id = $this->dc_bitrix_StageSwitcher($dc_status);
 
         $queryData = http_build_query([
             'entityTypeId' => $bitrix_entity_type_id,
             'fields' => [
-                //TODO Заполнить начальным статусом от ДК
+                'OPPORTUNITY' => $order_data['price'],
+                'STAGE_ID' => $stage_id
             ]
         ]);
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_POST => 1,
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $bitrix_webhook_url . $action,
+            CURLOPT_POSTFIELDS => $queryData,
+        ]);
+        $result = curl_exec($curl);
+        curl_close($curl);
+        $result = json_decode($result, 1);
+
+        if (!array_key_exists('error', $result)) {
+            return (is_array($result) && !empty($result["result"]['item']['id'])) ? $result["result"]['item']['id'] : false;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Метод перемещения заявки по стадиям смарт-процесса.
+     * @param int $sp_id
+     * @param int $dc_status
+     * @param int $bitrix_entity_type_id
+     * @param string $bitrix_webhook_url
+     * @return false|mixed
+     */
+    private function bitrixUpdateSP(int $sp_id, int $dc_status, int $bitrix_entity_type_id, string $bitrix_webhook_url)
+    {
+        $action = '/crm.item.update.json';
+
+        $stage_id = $this->dc_bitrix_StageSwitcher($dc_status);
+
+        $queryData = http_build_query([
+            'entityTypeId' => $bitrix_entity_type_id,
+            'id' => $sp_id,
+            'fields' => ['STAGE_ID' => $stage_id]
+        ]);
+
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_SSL_VERIFYPEER => 0,
@@ -260,7 +303,48 @@ class OrderController
      */
     private function sendToEmail(array $order_data, int $dc_status)
     {
+        $firstName = $order_data['firstName'];
+        $secondName = $order_data['secondName'];
+        $lastName = $order_data['lastName'];
+        $phone = $order_data['phone'];
+        $email = $order_data['email'];
+        $creditResult = $dc_status;
+        $order = $order_data['order'];
+        $codeTT = $order_data['codeTT'];
+        $name = $order_data['name'];
+        $price = $order_data['price'];
+        $address = $order_data['address'];
+        $birthdate = $order_data['birthdate'];
+        $metrikaClientId = $order_data['metrikaclientid'];
+        $url = $order_data['url'];
 
+        $body = "
+		Данные клиента <br>
+		ФИО: $firstName $secondName $lastName <br>
+		Телефон: $phone <br>
+		Почта: $email <br>
+		Адрес: $address <br>
+		Дата рождения: $birthdate <br>
+		--------------------- <br>
+		Информация по заявке <br>
+		Результат: $creditResult <br>
+		Номер заявки: $order <br>
+		codeTT: $codeTT <br>
+		url: $url <br>
+		--------------------- <br>
+		Информация о выборе <br>
+		Название техники: $name <br>
+		Стоимость: $price <br>
+		-------------------- <br>
+		Прочие данные <br>
+		ID метрики: $metrikaClientId
+	";
+
+        $to = $this->options['email'];
+        $subject = 'Заявка в кредит';
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+        wp_mail([$to], $subject, $body, $headers);
     }
 
     private function insertOrderToBD(array $data)
@@ -276,17 +360,17 @@ class OrderController
         $table_name = $wpdb->prefix . 'direct_credit_options';
         $res = $wpdb->update($table_name, $data, ['order_id' => $order_id]);
 
-        if ($res === 0) {
-
-        }
-
-        if ($res > 0) {
-
-        }
-
-        if (!$res) {
-
-        }
+//        if ($res === 0) {
+//
+//        }
+//
+//        if ($res > 0) {
+//
+//        }
+//
+//        if (!$res) {
+//
+//        }
     }
 
     private function getOrderFromDB(string $order_id)
@@ -296,7 +380,7 @@ class OrderController
         $row = $wpdb->get_results($wpdb->prepare("SELECT * FROM " . $table_name . " WHERE order_id = %s", trim($order_id)));
 
         if (count($row)) {
-            return $row;
+            return $row[0];
         } else {
             return false;
         }
@@ -305,10 +389,72 @@ class OrderController
 
     public function checkStatus($request)
     {
-        if($this->getOrderFromDB($request['order_id'])) {
+        if ($order = $this->getOrderFromDB($request['order_id'])) {
+            try {
+                $res = $this->soapClient->checkStatus(['data' => [
+                    'partnerID' => $this->options['partnerID'],
+                    'order' => $request['order_id']
+                ]]);
 
+                $dc_status = (int)$res['result']['status'];
+                $this->updateOrderToDB($request['order_id'], [
+                    'dc_status' => $dc_status,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+                if (isset($this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']) &&
+                    !empty($this->options['bitrix_entity_type_id']) && !empty($this->options['bitrix_webhook_url'])
+                ) {
+                    $this->bitrixUpdateSP($order['bitrix_sp_id'], $dc_status, $this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']);
+                }
+
+                return wp_send_json_success();
+            } catch (SoapFault $ex) {
+                return wp_send_json_error('Ошибка при вызове soap-метода checkStatus', 400);
+            }
         } else {
             return wp_send_json_error('Не найден такой order_id', 404);
+        }
+    }
+
+
+    private function dc_bitrix_StageSwitcher(int $dc_status)
+    {
+        switch ($dc_status) {
+            case 0:
+                return 'DT165_34:NEW';
+            case 1:
+                return 'DT165_34:PREPARATION';
+            case 3:
+                return 'DT165_34:CLIENT';
+            case 5:
+                return 'DT165_34:UC_CTIPLB';
+            case 6:
+                return 'DT165_34:2';
+            case 7:
+                return 'DT165_34:3';
+            case 9:
+                return 'DT165_34:4';
+            case 10:
+                return 'DT165_34:5';
+            case 11:
+                return 'DT165_34:6';
+            case 12:
+                return 'DT165_34:7';
+            case 13:
+                return 'DT165_34:SUCCESS';
+
+            /** Отказные статусы */
+            case 4:
+                return 'DT165_34:FAIL';
+            case 8:
+                return 'DT165_34:1';
+            case 14:
+                return 'DT165_34:8';
+            case 17:
+                return 'DT165_34:9';
+            case 18:
+                return 'DT165_34:10';
         }
     }
 }
