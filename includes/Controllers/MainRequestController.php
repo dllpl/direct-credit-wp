@@ -26,7 +26,6 @@
  * @subpackage Direct_Credit_WP/includes
  * @author     Nikita Ivanov (Nick Iv)
  */
-
 class MainRestController extends WP_REST_Controller
 {
     const NAMESPACE = 'dc/v1';
@@ -39,13 +38,13 @@ class MainRestController extends WP_REST_Controller
             'callback' => [$this, 'createOrder'],
             'permission_callback' => '__return_true',
             'args' => [
-                'phone'=> [
+                'phone' => [
                     'description' => __('Поле phone обязательно к заполнению в формате 79000000000.'),
                     'type' => 'string',
                     'pattern' => '^7+\d{10}$',
                     'required' => true,
                 ],
-                'item_name'=>[
+                'item_name' => [
                     'description' => __('Поле item_name обязательно к заполнению.'),
                     'type' => 'string',
                     'required' => true,
@@ -62,6 +61,7 @@ class MainRestController extends WP_REST_Controller
                 'order_id' => [
                     'description' => __('Поле order_id обязательно к заполнению.'),
                     'type' => 'string',
+                    'format' => 'uuid',
                     'required' => true,
                 ],
             ],
@@ -136,6 +136,7 @@ class MainRestController extends WP_REST_Controller
                 'email' => [
                     'description' => __('Ошибка в поле email'),
                     'type' => 'string',
+                    'format' => 'email',
                     'minLength' => 3,
                     'default' => null
                 ],
