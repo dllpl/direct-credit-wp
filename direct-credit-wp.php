@@ -25,6 +25,8 @@ add_action('admin_menu', 'admin_menu_direct_credit_wp');
 register_activation_hook(__FILE__, 'activate_direct_credit_wp');
 register_uninstall_hook(__FILE__, 'uninstall_direct_credit_wp');
 
+add_action('wp_enqueue_scripts', 'script_init');
+
 /** Добавление ссылки на настройки плагина */
 function admin_menu_direct_credit_wp()
 {
@@ -46,6 +48,14 @@ function register_routes()
     require_once plugin_dir_path(__FILE__) . 'includes/Controllers/MainRequestController.php';
     $controller = new MainRestController();
     $controller->registerRoutes();
+}
+
+/** Инициализация js скрипта */
+function script_init()
+{
+    require_once plugin_dir_path(__FILE__) . 'public/Controllers/PublicController.php';
+    $controller = new PublicController();
+    $controller->scriptInit();
 }
 
 /** Удаление плагина */

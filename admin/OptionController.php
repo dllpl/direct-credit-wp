@@ -30,27 +30,35 @@ class OptionPage
         <div class="wrap">
             <h2><?php echo get_admin_page_title() ?></h2>
             <form>
+                <h3>Данные для авторизации Soap-клиента</h3>
                 <label for="login">Login<span style="color: red">*</span></label> <br>
                 <input type="text" id="login" name="login" value="<?php echo $options['login'] ?? null ?>" required><br>
                 <label for="password">Password<span style="color: red">*</span></label> <br>
                 <input type="password" id="password" name="password" value="<?php echo $options['password'] ?? null ?>" required><br>
-
-                <hr>
-
-                <label for="partnerID">partnerID<span style="color: red">*</span></label> <br>
-                <input type="text" id="partnerID" name="partnerID" value="<?php echo $options['partnerID'] ?? null ?>" required><br>
-                <label for="codeTT">codeTT<span style="color: red">*</span></label> <br>
-                <input type="text" id="codeTT" name="codeTT" value="<?php echo $options['codeTT'] ?? null ?>" required><br>
-
-                <hr>
-
                 <label for="wsdl">WSDL (URL)<span style="color: red">*</span></label> <br>
                 <input type="url" pattern="https://.*" id="wsdl" name="wsdl" value="<?php echo $options['wsdl'] ?? null ?>" required><br>
                 <label for="location">Location (URL)<span style="color: red">*</span></label> <br>
                 <input type="url" pattern="https://.*" placeholder="" id="location" name="location" value="<?php echo $options['location'] ?? null ?>" required><br>
-
                 <hr>
-
+                <h3>Данные партнера</h3>
+                <label for="partnerID">partnerID<span style="color: red">*</span></label> <br>
+                <input type="text" id="partnerID" name="partnerID" value="<?php echo $options['partnerID'] ?? null ?>" required><br>
+                <label for="codeTT">codeTT<span style="color: red">*</span></label> <br>
+                <input type="text" id="codeTT" name="codeTT" value="<?php echo $options['codeTT'] ?? null ?>" required><br>
+                <hr>
+<!--                <h3>Данные для работы скриптов</h3>-->
+<!--                <label for="click_on_credit_id">ID кнопки, запускающей модальное окно первого шага кредита<span style="color: red">*</span></label> <br>-->
+<!--                <input type="text" id="click_on_credit_id" name="click_on_credit_id" value="--><?php //echo $options['click_on_credit_id'] ?? null ?><!--" required><br>-->
+<!--                <label for="credit_form_id">ID формы перового шага кредита<span style="color: red">*</span></label> <br>-->
+<!--                <input type="text" id="credit_form_id" name="credit_form_id" value="--><?php //echo $options['credit_form_id'] ?? null ?><!--" required><br>-->
+<!--                <label for="card_product_id">ID карточки товара<span style="color: red">*</span></label> <br>-->
+<!--                <input type="text" id="card_product_id" name="card_product_id" value="--><?php //echo $options['card_product_id'] ?? null ?><!--" required><br>-->
+<!--                <label for="price_id">ID цены товара<span style="color: red">*</span></label> <br>-->
+<!--                <input type="text" id="price_id" name="price_id" value="--><?php //echo $options['price_id'] ?? null ?><!--" required><br>-->
+<!--                <label for="name_product_id">ID названия товара<span style="color: red">*</span></label> <br>-->
+<!--                <input type="text" id="name_product_id" name="name_product_id" value="--><?php //echo $options['name_product_id'] ?? null ?><!--" required><br>-->
+<!--                <hr>-->
+                <h3>Конечные точки (необязательные поля)</h3>
                 <label for="email">Email (оставьте пустым, если не хотите использовать отправку на почту)</label> <br>
                 <input type="email" id="email" name="email" value="<?php echo $options['email'] ?? null ?>"><br>
                 <label for="bitrix_webhook_url">Битрикс24 API URL (оставьте пустым, если не хотите интегрировать с битрикс24)</label> <br>

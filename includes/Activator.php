@@ -47,6 +47,13 @@ class Activator
             `password` VARCHAR(255) NOT NULL,
             `wsdl` VARCHAR(255) NOT NULL,
             `location` VARCHAR(255) NOT NULL,
+            
+            --`click_on_credit_id` VARCHAR(255) NOT NULL,
+            --`credit_form_id` VARCHAR(255) NOT NULL,
+            --`card_product_id` VARCHAR(255) NOT NULL,
+            --`price_id` VARCHAR(255) NOT NULL,
+            --`name_product_id` VARCHAR(255) NOT NULL,
+            
             `bitrix_webhook_url` VARCHAR(255) DEFAULT NULL,
             `bitrix_entity_type_id` INT DEFAULT NULL,
             `email` VARCHAR(255) DEFAULT NULL,
