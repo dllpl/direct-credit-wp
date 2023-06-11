@@ -20,12 +20,13 @@ class PublicController
 
         if ($this->options && is_array($this->options)) {
             $data = [
-                'click_on_credit_id' => $this->options['click_on_credit_id'],
-                'credit_form_id' => $this->options['credit_form_id'],
-                'card_product_id' => $this->options['card_product_id'],
-                'price_id' => $this->options['price_id'],
-                'name_product_id' => $this->options['name_product_id'],
-                'create_order_uri' => 'dc/v1/createOrder'
+                'partnerID' => $this->options['partnerID'],
+//                'click_on_credit_id' => $this->options['click_on_credit_id'],
+//                'credit_form_id' => $this->options['credit_form_id'],
+//                'card_product_id' => $this->options['card_product_id'],
+//                'price_id' => $this->options['price_id'],
+//                'name_product_id' => $this->options['name_product_id'],
+                'createOrderUri' => 'dc/v1/createOrder'
             ];
         } else {
             $data = ['error' => 'Задайте настройки плагина Директ Кредит, чтобы начать работу.'];
