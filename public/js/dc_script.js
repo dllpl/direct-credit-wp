@@ -20,8 +20,6 @@ if (!dcData?.error) {
 
         /** Объект формы */
         var formProps
-        /** Рандомная строка номера заказа */
-        var id
 
         var phone_raw = null
 
@@ -40,7 +38,6 @@ if (!dcData?.error) {
                 });
             });
 
-            /** После в */
             jQuery(document).on('submit_success', credit_form_id, (e) => {
 
                 let formData = new FormData(e.target)
