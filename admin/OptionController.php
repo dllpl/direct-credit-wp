@@ -64,7 +64,7 @@ class OptionPage
                 <label for="bitrix_webhook_url">Битрикс24 API URL (оставьте пустым, если не хотите интегрировать с битрикс24)</label> <br>
                 <input type="url" placeholder="Пример: https://{domain}.bitrix24.ru/rest/{user}/{key}" pattern="https://.*" id="bitrix_webhook_url" name="bitrix_webhook_url" value="<?php echo $options['bitrix_webhook_url'] ?? null ?>"><br>
                 <label for="bitrix_entity_type_id">Идентификатор смарт-процесса (оставьте пустым, если не хотите создавать смарт-процесс)</label> <br>
-                <input type="number" placeholder="Числовой идентификатор" id="bitrix_entity_type_id" name="bitrix_entity_type_id" value="<?php echo $options['bitrix_entity_type_id'] ?? null ?>"><br>
+                <input type="text" placeholder="Числовой идентификатор" id="bitrix_entity_type_id" name="bitrix_entity_type_id" value="<?php echo $options['bitrix_entity_type_id'] ?? null ?>"><br>
 
                 <div style="color: red" id="error"></div>
                 <div style="color: forestgreen" id="success"></div>
