@@ -29,7 +29,7 @@ if (!dcData?.error) {
                 } else {
                     console.log('error');
                 }
-            });
+            })
         })
     })
 } else {
