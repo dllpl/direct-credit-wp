@@ -232,7 +232,8 @@ class OrderController
             'entityTypeId' => $bitrix_entity_type_id,
             'fields' => [
                 'OPPORTUNITY' => $order_data['price'],
-                'STAGE_ID' => $stage_id
+                'STAGE_ID' => $stage_id,
+                'PARENT_ID_1' => $lead_id,
             ]
         ]);
         $curl = curl_init();
