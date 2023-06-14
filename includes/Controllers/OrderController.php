@@ -87,7 +87,7 @@ class OrderController
                 $this->sendToEmail($order_data, $dc_status);
             }
 
-            /** Если указан вебхук Битрикс24, создаем */
+            /** Если указан вебхук Битрикс24, создаем лида */
             if (isset($this->options['bitrix_webhook_url']) && !empty($this->options['bitrix_webhook_url'])) {
 
                 $lead_id = $this->bitrixCreateLead($order_data, $dc_status, $this->options['bitrix_webhook_url']);
