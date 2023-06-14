@@ -19,7 +19,7 @@ if (!dcData?.error) {
 
         $(`#${click_on_credit_id}`).on('click', () => {
             $.ajax({
-                url: createOrderUri,
+                url: dcData.createOrderUri,
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
