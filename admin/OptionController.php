@@ -46,18 +46,26 @@ class OptionPage
                 <label for="codeTT">codeTT<span style="color: red">*</span></label> <br>
                 <input type="text" id="codeTT" name="codeTT" value="<?php echo $options['codeTT'] ?? null ?>" required><br>
                 <hr>
-<!--                <h3>Данные для работы скриптов</h3>-->
-<!--                <label for="click_on_credit_id">ID кнопки, запускающей модальное окно первого шага кредита<span style="color: red">*</span></label> <br>-->
-<!--                <input type="text" id="click_on_credit_id" name="click_on_credit_id" value="--><?php //echo $options['click_on_credit_id'] ?? null ?><!--" required><br>-->
-<!--                <label for="credit_form_id">ID формы перового шага кредита<span style="color: red">*</span></label> <br>-->
-<!--                <input type="text" id="credit_form_id" name="credit_form_id" value="--><?php //echo $options['credit_form_id'] ?? null ?><!--" required><br>-->
-<!--                <label for="card_product_id">ID карточки товара<span style="color: red">*</span></label> <br>-->
-<!--                <input type="text" id="card_product_id" name="card_product_id" value="--><?php //echo $options['card_product_id'] ?? null ?><!--" required><br>-->
-<!--                <label for="price_id">ID цены товара<span style="color: red">*</span></label> <br>-->
-<!--                <input type="text" id="price_id" name="price_id" value="--><?php //echo $options['price_id'] ?? null ?><!--" required><br>-->
-<!--                <label for="name_product_id">ID названия товара<span style="color: red">*</span></label> <br>-->
-<!--                <input type="text" id="name_product_id" name="name_product_id" value="--><?php //echo $options['name_product_id'] ?? null ?><!--" required><br>-->
-<!--                <hr>-->
+                <h3>Способ работы плагина</h3>
+                <div>
+                    <input type="radio" id="integration_method_rest"
+                           name="integration_method" value="rest" <?php echo $options['integration_method'] === 'rest' ? 'checked' : '' ?>>
+                    <label for="contactChoice1">REST</label>
+                    <input type="radio" id="integration_method_rest_js"
+                           name="integration_method" value="rest_js" <?php echo $options['integration_method'] === 'rest_js' ? 'checked' : '' ?>>
+                    <label for="contactChoice1">REST + JS</label>
+                </div>
+                <hr>
+                <h3>Данные для работы скриптов (обязательно, если выбран вариант REST + JS)</h3>
+                <label for="price_id">ID поля цены товара</label> <br>
+                <input type="text" id="price_id" name="price_id" value="<?php echo $options['price_id'] ?? null ?>"><br>
+                <label for="name_product_id">ID поля названия товара</label> <br>
+                <input type="text" id="name_product_id" name="name_product_id" value="<?php echo $options['name_product_id'] ?? null ?>"><br>
+                <label for="phone_id">ID поля указания телефона</label> <br>
+                <input type="text" id="phone_id" name="phone_id" value="<?php echo $options['phone_id'] ?? null ?>"><br>
+                <label for="click_on_credit_id">ID кнопки оформления кредита (кнопка действия)</label> <br>
+                <input type="text" id="click_on_credit_id" name="click_on_credit_id" value="<?php echo $options['click_on_credit_id'] ?? null ?>"><br>
+                <hr>
                 <h3>Конечные точки (необязательные поля)</h3>
                 <label for="email">Email (оставьте пустым, если не хотите использовать отправку на почту)</label> <br>
                 <input type="email" id="email" name="email" value="<?php echo $options['email'] ?? null ?>"><br>
@@ -132,7 +140,12 @@ class OptionPage
             'bitrix_webhook_url' => $request['bitrix_webhook_url'] ?? null,
             'bitrix_entity_type_id' => $request['bitrix_entity_type_id'] ?? null,
             'codeTT' => $request['codeTT'],
-            'partnerID' => $request['partnerID']
+            'partnerID' => $request['partnerID'],
+
+            'price_id' => $request['price_id'] ? str_replace('#', '', $request['price_id']) : null,
+            'name_product_id' => $request['name_product_id']  ? str_replace('#', '', $request['name_product_id']) : null,
+            'phone_id' => $request['phone_id'] ? str_replace('#', '', $request['phone_id']) : null,
+            'integration_method' => $request['integration_method']
         ];
 
         $result = $wpdb->insert($table_name, $data);

@@ -121,36 +121,31 @@ class MainRestController extends WP_REST_Controller
                     'minLength' => 3,
                     'required' => true,
                 ],
-//                'click_on_credit_id' =>[
-//                    'description' => __('Поле click_on_credit_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'credit_form_id' =>[
-//                    'description' => __('Поле credit_form_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'card_product_id' =>[
-//                    'description' => __('Поле card_product_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'price_id' =>[
-//                    'description' => __('Поле price_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'name_product_id' =>[
-//                    'description' => __('Поле name_product_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
+                'integration_method' => [
+                    'description' => __('Поле integration_method обязательно к заполнению.'),
+                    'type' => 'string',
+                    'pattern' => '^rest_js$|^rest$',
+                    'minLength' => 3,
+                    'required' => true,
+                ],
+                'price_id' =>[
+                    'description' => __('Поле price_id обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 1,
+                    'required' => false,
+                ],
+                'name_product_id' =>[
+                    'description' => __('Поле name_product_id обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 1,
+                    'required' => false,
+                ],
+                'phone_id' =>[
+                    'description' => __('Поле phone_id обязательно к заполнению.'),
+                    'type' => 'string',
+                    'minLength' => 1,
+                    'required' => false,
+                ],
                 'bitrix_webhook_url' => [
                     'description' => __('Ошибка в поле bitrix_webhook_url'),
                     'type' => 'string',
@@ -194,6 +189,12 @@ class MainRestController extends WP_REST_Controller
     public function updateSettings(WP_REST_Request $request)
     {
         require_once plugin_dir_path(__FILE__) . '../../admin/OptionController.php';
+
+        if($request['name_product_id'] === 'rest_js') {
+            if(!isset($request['price_id'], $request['name_product_id'], $request['phone_id'])) {
+                return wp_send_json_error('Для выбранного типа интеграции REST + JS необходимо заполнить поля раздела "Данные для работы скриптов"');
+            }
+        }
 
         $optionPage = new OptionPage();
         return $optionPage->updateSettings($request);

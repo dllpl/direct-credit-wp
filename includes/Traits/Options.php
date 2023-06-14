@@ -23,11 +23,10 @@ trait Options
                 'codeTT'=> $rows[0]->codeTT,
                 'partnerID' => $rows[0]->partnerID,
 
-//                'click_on_credit_id' => $rows[0]->click_on_credit_id,
-//                'credit_form_id' => $rows[0]->credit_form_id,
-//                'card_product_id' => $rows[0]->card_product_id,
-//                'price_id' => $rows[0]->price_id,
-//                'name_product_id' => $rows[0]->name_product_id,
+                'price_id' => $rows[0]->price_id,
+                'name_product_id' => $rows[0]->name_product_id,
+                'phone_id' => $rows[0]->phone_id,
+                'integration_method' => $rows[0]->integration_method
             ];
         } else {
             return false;

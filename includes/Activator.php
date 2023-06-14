@@ -50,6 +50,11 @@ class Activator
             `bitrix_webhook_url` VARCHAR(255) DEFAULT NULL,
             `bitrix_entity_type_id` INT DEFAULT NULL,
             `email` VARCHAR(255) DEFAULT NULL,
+            `price_id` VARCHAR(255) DEFAULT NULL,
+            `integration_method` VARCHAR (10) DEFAULT 'rest'
+            `name_product_id` VARCHAR(255) DEFAULT NULL,
+            `click_on_credit_id` VARCHAR(255) DEFAULT NULL,
+            `phone_id` VARCHAR(255) DEFAULT NULL,
             `created_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)
         ) $charset_collate
