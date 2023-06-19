@@ -69,8 +69,8 @@ class OrderController
         /** Отправляем в ДК */
         if ($res = $this->sendToDK($order_data)) {
 
-            $dc_status = (int)$res->status;
-            $dc_api_key = $res->apiKey;
+            $dc_status = (int)$res->result->status;
+            $dc_api_key = $res->result->apiKey;
 
             $this->insertOrderToBD([
                 'order_id' => $order_data['order_id'],
