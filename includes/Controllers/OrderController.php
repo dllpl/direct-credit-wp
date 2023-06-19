@@ -418,7 +418,6 @@ class OrderController
         }
     }
 
-
     private function dc_bitrix_StageSwitcher(int $dc_status)
     {
         switch ($dc_status) {

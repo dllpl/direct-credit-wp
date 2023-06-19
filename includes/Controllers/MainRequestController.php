@@ -121,36 +121,6 @@ class MainRestController extends WP_REST_Controller
                     'minLength' => 3,
                     'required' => true,
                 ],
-//                'click_on_credit_id' =>[
-//                    'description' => __('Поле click_on_credit_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'credit_form_id' =>[
-//                    'description' => __('Поле credit_form_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'card_product_id' =>[
-//                    'description' => __('Поле card_product_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'price_id' =>[
-//                    'description' => __('Поле price_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
-//                'name_product_id' =>[
-//                    'description' => __('Поле name_product_id обязательно к заполнению.'),
-//                    'type' => 'string',
-//                    'minLength' => 1,
-//                    'required' => true,
-//                ],
                 'bitrix_webhook_url' => [
                     'description' => __('Ошибка в поле bitrix_webhook_url'),
                     'type' => 'string',
@@ -159,6 +129,12 @@ class MainRestController extends WP_REST_Controller
                 ],
                 'bitrix_entity_type_id' => [
                     'description' => __('Ошибка в поле bitrix_entity_type_id'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'default' => null
+                ],
+                'bitrix_source_id' => [
+                    'description' => __('Ошибка в поле bitrix_source_id'),
                     'type' => 'string',
                     'minLength' => 3,
                     'default' => null

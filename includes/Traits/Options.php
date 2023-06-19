@@ -1,4 +1,5 @@
 <?php
+
 trait Options
 {
     /**
@@ -19,15 +20,10 @@ trait Options
                 'location' => $rows[0]->location,
                 'email' => $rows[0]->email,
                 'bitrix_webhook_url' => $rows[0]->bitrix_webhook_url,
-                'bitrix_entity_type_id' => (int) $rows[0]->bitrix_entity_type_id,
-                'codeTT'=> $rows[0]->codeTT,
+                'bitrix_entity_type_id' => (int)$rows[0]->bitrix_entity_type_id,
+                'bitrix_source_id' => $rows[0]->bitrix_source_id,
+                'codeTT' => $rows[0]->codeTT,
                 'partnerID' => $rows[0]->partnerID,
-
-//                'click_on_credit_id' => $rows[0]->click_on_credit_id,
-//                'credit_form_id' => $rows[0]->credit_form_id,
-//                'card_product_id' => $rows[0]->card_product_id,
-//                'price_id' => $rows[0]->price_id,
-//                'name_product_id' => $rows[0]->name_product_id,
             ];
         } else {
             return false;
