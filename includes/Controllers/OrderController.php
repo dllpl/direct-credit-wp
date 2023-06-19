@@ -69,8 +69,8 @@ class OrderController
         /** Отправляем в ДК */
         if ($res = $this->sendToDK($order_data)) {
 
-            $dc_status = (int)$res[0]['status'];
-            $dc_api_key = $res[0]['apiKey'];
+            $dc_status = (int)$res->status;
+            $dc_api_key = $res->apiKey;
 
             $this->insertOrderToBD([
                 'order_id' => $order_data['order_id'],
@@ -112,7 +112,7 @@ class OrderController
     /**
      * Отправка в Директ Кредит и получение Api токена.
      * @param array $order_data
-     * @return false|void
+     * @return false|stdClass
      */
     private function sendToDK(array $order_data)
     {
@@ -130,7 +130,7 @@ class OrderController
             ],
             'goods' => [
                 [
-                    'id' => $order_data['order'],
+                    'id' => $order_data['order_id'],
                     'name' => $order_data['item_name'],
                     'price' => $order_data['price'],
                     'quantity' => 1,
