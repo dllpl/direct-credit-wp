@@ -84,13 +84,13 @@ if (!dcData?.error) {
                 });
             })
         })
-
-        function DCCheckStatus(result) {
-            document.location.href = 'https://steelracing.ru/stranitsa-blagodarnosti-2020/'
-        }
     })
 } else {
     console.log(dcData.error)
+}
+
+function DCCheckStatus(result) {
+    document.location.href = 'https://steelracing.ru/stranitsa-blagodarnosti-2020/'
 }
 
 
