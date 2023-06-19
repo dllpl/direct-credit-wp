@@ -22,6 +22,7 @@ trait Options
                 'bitrix_webhook_url' => $rows[0]->bitrix_webhook_url,
                 'bitrix_entity_type_id' => (int)$rows[0]->bitrix_entity_type_id,
                 'bitrix_source_id' => $rows[0]->bitrix_source_id,
+                'finish_redirect_url'=> $rows[0]->finish_redirect_url,
                 'codeTT' => $rows[0]->codeTT,
                 'partnerID' => $rows[0]->partnerID,
             ];
