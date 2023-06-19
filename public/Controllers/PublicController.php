@@ -15,8 +15,11 @@ class PublicController
 
     public function scriptInit()
     {
-        wp_enqueue_script('dc_script', plugins_url('../../public/js/dc_script.js', __FILE__), ['jquery'],
-            filemtime(plugin_dir_path(__FILE__) . '../../public/js/dc_script.js'), 'in_footer');
+        wp_enqueue_script('dc_script', plugins_url('../../public/css/dc_script.js', __FILE__), ['jquery'],
+            filemtime(plugin_dir_path(__FILE__) . '../../public/css/dc_script.js'), 'in_footer');
+
+        wp_enqueue_style('dc_style', plugins_url('../../public/css/dc_style.css', __FILE__), [],
+            filemtime(plugin_dir_path(__FILE__) . '../../public/css/dc_script.js'), 'all');
 
         if ($this->options && is_array($this->options)) {
             $data = [
