@@ -41,7 +41,7 @@ class MainRestController extends WP_REST_Controller
                 'phone' => [
                     'description' => __('Поле phone обязательно к заполнению в формате 79000000000.'),
                     'type' => 'string',
-                    'pattern' => '^7+\d{10}$',
+                    'pattern' => '^9+\d{9}$',
                     'required' => true,
                 ],
                 'item_name' => [
