@@ -100,7 +100,7 @@ class OrderController
                 $this->updateOrderToDB($order_data['order_id'], [
                     'bitrix_lead_id' => $lead_id,
                     'bitrix_sp_id' => $sp_id ?? null,
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'updated_at' => wp_date('Y-m-d H:i:s')
                 ]);
             }
             return wp_send_json_success($dc_api_key);
@@ -397,16 +397,16 @@ class OrderController
                     'order' => $request['order_id']
                 ]]);
 
-                $dc_status = (int)$res['result']['status'];
+                $dc_status = (int)$res->result->status;
                 $this->updateOrderToDB($request['order_id'], [
                     'dc_status' => $dc_status,
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'updated_at' => wp_date('Y-m-d H:i:s')
                 ]);
 
                 if (isset($this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']) &&
                     !empty($this->options['bitrix_entity_type_id']) && !empty($this->options['bitrix_webhook_url'])
                 ) {
-                    $this->bitrixUpdateSP($order['bitrix_sp_id'], $dc_status, $this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']);
+                    $this->bitrixUpdateSP($order->bitrix_sp_id, $dc_status, $this->options['bitrix_entity_type_id'], $this->options['bitrix_webhook_url']);
                 }
 
                 return wp_send_json_success();
