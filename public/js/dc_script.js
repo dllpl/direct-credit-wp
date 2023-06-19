@@ -78,7 +78,6 @@ if (!dcData?.error) {
                         console.log(response)
 
                         DCLoans (partnerID, 'orderByToken', {token : response.data.token}, function(result){});
-                        //document.location.href = 'https://steelracing.ru/stranitsa-blagodarnosti-2020/'
                     } else {
                         console.log('error');
                     }
@@ -86,6 +85,9 @@ if (!dcData?.error) {
             })
         })
 
+        function DCCheckStatus(result) {
+            document.location.href = 'https://steelracing.ru/stranitsa-blagodarnosti-2020/'
+        }
     })
 } else {
     console.log(dcData.error)
