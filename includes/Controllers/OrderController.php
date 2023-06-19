@@ -69,8 +69,8 @@ class OrderController
         /** Отправляем в ДК */
         if ($res = $this->sendToDK($order_data)) {
 
-            $dc_status = (int)$res->status;
-            $dc_api_key = $res->apiKey;
+            $dc_status = (int)$res->result->status;
+            $dc_api_key = $res->result->apiKey;
 
             $this->insertOrderToBD([
                 'order_id' => $order_data['order_id'],
@@ -159,7 +159,7 @@ class OrderController
 
         $queryData = http_build_query([
             "fields" => [
-                "TITLE" => "Кредит | " . $order_data['name'] . " | " . $order_data['address'],
+                "TITLE" => "Кредит | " . $order_data['item_name'] . " | " . $order_data['address'],
                 "NAME" => $order_data['firstName'],
                 "SECOND_NAME" => $order_data['secondName'],
                 "LAST_NAME" => $order_data['lastName'],
@@ -358,7 +358,7 @@ class OrderController
     private function updateOrderToDB(string $order_id, array $data)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'direct_credit_options';
+        $table_name = $wpdb->prefix . 'direct_credit_orders';
         $res = $wpdb->update($table_name, $data, ['order_id' => $order_id]);
 
 //        if ($res === 0) {
