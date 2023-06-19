@@ -19,7 +19,6 @@
  * @subpackage Direct_Credit_WP/includes
  * @author     Nikita Ivanov (Nick Iv)
  */
-
 class Activator
 {
 
@@ -50,6 +49,7 @@ class Activator
             `bitrix_webhook_url` VARCHAR(255) DEFAULT NULL,
             `bitrix_entity_type_id` INT DEFAULT NULL,
             `bitrix_source_id` VARCHAR(255) DEFAULT NULL,
+            `finish_redirect_url` VARCHAR(255) DEFAULT NULL,
             `email` VARCHAR(255) DEFAULT NULL,
             `created_at` DATETIME DEFAULT NOW(),
             PRIMARY KEY (`id`)

@@ -66,6 +66,10 @@ class OptionPage
                 <label for="bitrix_source_id">SOURCE ID</label> <br>
                 <input type="text" placeholder="Идентификатор источника" id="bitrix_source_id" name="bitrix_source_id"
                        value="<?php echo $options['bitrix_source_id'] ?? null ?>"><br>
+                <label for="finish_redirect_url">URL-перенаправления при окончании работы с формой</label> <br>
+                <input type="url" pattern="https://.*" placeholder="https://..." id="finish_redirect_url"
+                       name="finish_redirect_url"
+                       value="<?php echo $options['finish_redirect_url'] ?? null ?>"><br>
 
                 <div style="color: red" id="error"></div>
                 <div style="color: forestgreen" id="success"></div>
@@ -136,7 +140,8 @@ class OptionPage
             'email' => $request['email'] ?? null,
             'bitrix_webhook_url' => $request['bitrix_webhook_url'] ?? null,
             'bitrix_entity_type_id' => $request['bitrix_entity_type_id'] ?? null,
-            'bitrix_source_id' => $request['bitrix_source_id'] ?? null
+            'bitrix_source_id' => $request['bitrix_source_id'] ?? null,
+            'finish_redirect_url' => $request['finish_redirect_url'] ?? null
         ];
 
         $result = $wpdb->insert($table_name, $data);

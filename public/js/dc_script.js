@@ -90,7 +90,7 @@ if (!dcData?.error) {
 }
 
 function DCCheckStatus(result) {
-    document.location.href = 'https://steelracing.ru/stranitsa-blagodarnosti-2020/'
+    document.location.href = dcData?.finish_redirect_url ?? '/'
 }
 
 

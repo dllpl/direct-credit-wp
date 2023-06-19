@@ -139,6 +139,12 @@ class MainRestController extends WP_REST_Controller
                     'minLength' => 3,
                     'default' => null
                 ],
+                'finish_redirect_url' => [
+                    'description' => __('Ошибка в поле finish_redirect_url'),
+                    'type' => 'string',
+                    'minLength' => 3,
+                    'default' => null
+                ],
                 'email' => [
                     'description' => __('Ошибка в поле email'),
                     'type' => 'string',

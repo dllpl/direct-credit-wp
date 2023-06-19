@@ -90,7 +90,7 @@ class OrderController
             /** Если указан вебхук Битрикс24, создаем лида */
             if (isset($this->options['bitrix_webhook_url']) && !empty($this->options['bitrix_webhook_url'])) {
 
-                $lead_id = $this->bitrixCreateLead($order_data, $dc_status, $this->options['bitrix_webhook_url']);
+                $lead_id = $this->bitrixCreateLead($order_data, $dc_status, $this->options['bitrix_webhook_url'], $this->options['bitrix_source_id']);
 
                 /** Если указан Идентификатор смарт-процесса, создаем */
                 if (isset($this->options['bitrix_entity_type_id']) && !empty($this->options['bitrix_entity_type_id'])) {
@@ -153,7 +153,7 @@ class OrderController
      * @param string $bitrix_webhook_url
      * @return false|mixed|void
      */
-    private function bitrixCreateLead(array $order_data, int $dc_status, string $bitrix_webhook_url)
+    private function bitrixCreateLead(array $order_data, int $dc_status, string $bitrix_webhook_url, string $bitrix_source_id)
     {
         $action = '/crm.lead.add.json';
 
@@ -183,7 +183,7 @@ class OrderController
                 ],
                 "UF_CRM_1676289780" => $order_data['metrikaClientId'],
                 "UF_CRM_MGO_CC_TAG_ID" => "Кредит",
-                "SOURCE_ID" => "UC_AITU1Z",
+                "SOURCE_ID" => $bitrix_source_id ?? "UC_AITU1Z",
                 "ADDRESS_CITY" => $order_data['address'],
                 "UF_CRM_1683280552822" => $dc_status,
                 "UF_CRM_1683536841182" => $order_data['order_id'],

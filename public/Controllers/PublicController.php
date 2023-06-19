@@ -21,6 +21,7 @@ class PublicController
         if ($this->options && is_array($this->options)) {
             $data = [
                 'partnerID' => $this->options['partnerID'],
+                'finish_redirect_url' => $this->options['finish_redirect_url'],
                 'createOrderUri' => 'dc/v1/createOrder'
             ];
         } else {
