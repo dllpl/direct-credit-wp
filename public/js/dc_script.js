@@ -40,7 +40,7 @@ if (!dcData?.error) {
 
             jQuery(document).on('submit_success', credit_form_id, (e) => {
 
-                $('body').prepend('<div class="preloader"><div class="preloader__row"><div class="preloader__item"></div><div class="preloader__item"></div></div></div>')
+                $('body').append('<div class="preloader"><div class="preloader__row"><div class="preloader__item"></div><div class="preloader__item"></div></div></div>')
 
                 let formData = new FormData(e.target)
                 formProps = Object.fromEntries(formData);
