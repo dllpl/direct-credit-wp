@@ -1,6 +1,5 @@
 if (!dcData?.error) {
     jQuery(function ($) {
-        $('body').prepend('<div class="preloader"><div class="preloader__row"><div class="preloader__item"></div><div class="preloader__item"></div></div></div>')
         $('body').append("" +
             "<link rel='stylesheet' href='//dcapi.direct-credit.ru/style.css' type='text/css'/> " +
             "<script src='//dcapi.direct-credit.ru/JsHttpRequest.js' type='text/javascript'></script> " +
@@ -40,6 +39,8 @@ if (!dcData?.error) {
             });
 
             jQuery(document).on('submit_success', credit_form_id, (e) => {
+
+                $('body').prepend('<div class="preloader"><div class="preloader__row"><div class="preloader__item"></div><div class="preloader__item"></div></div></div>')
 
                 let formData = new FormData(e.target)
                 formProps = Object.fromEntries(formData);
