@@ -25,7 +25,7 @@ class PublicController
             $data = [
                 'partnerID' => $this->options['partnerID'],
                 'finish_redirect_url' => $this->options['finish_redirect_url'],
-                'createOrderUri' => '/dc/v1/createOrder'
+                'createOrderUri' => 'wp-json/dc/v1/createOrder'
             ];
         } else {
             $data = ['error' => 'Задайте настройки плагина Директ Кредит, чтобы начать работу.'];
