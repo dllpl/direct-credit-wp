@@ -19,7 +19,7 @@ class PublicController
             filemtime(plugin_dir_path(__FILE__) . '../../public/js/dc_script.js'), 'in_footer');
 
         wp_enqueue_style('dc_style', plugins_url('../../public/css/dc_style.css', __FILE__), [],
-            filemtime(plugin_dir_path(__FILE__) . '../../public/css/dc_script.js'), 'all');
+            filemtime(plugin_dir_path(__FILE__) . '../../public/css/dc_script.css'), 'all');
 
         if ($this->options && is_array($this->options)) {
             $data = [
