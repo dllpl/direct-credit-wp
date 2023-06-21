@@ -316,7 +316,7 @@ class OrderController
         $price = $order_data['price'];
         $address = $order_data['address'];
         $birthdate = $order_data['birthdate'];
-        $metrikaClientId = $order_data['metrikaclientid'];
+        $metrikaClientId = $order_data['metrikaClientId'];
         $url = $order_data['url'];
 
         $body = "
