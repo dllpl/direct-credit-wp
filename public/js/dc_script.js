@@ -81,7 +81,7 @@ if (!dcData?.error) {
 
                         document.getElementById('dc_loader').style.display = 'none';
 
-                        DCLoans(partnerID, 'orderByToken', {token: response.data.token}, function (result) {
+                        DCLoans(partnerID, 'orderByToken', {token: response.data}, function (result) {
                         });
                     } else {
                         console.log('error');
