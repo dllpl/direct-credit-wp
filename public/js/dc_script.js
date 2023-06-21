@@ -1,6 +1,6 @@
 if (!dcData?.error) {
     jQuery(function ($) {
-        $('body').prepend('<div class="preloader"><div class="preloader__row"><div class="preloader__item"></div><div class="preloader__item"></div></div></div>')
+        $('body').prepend('<div id="dc_loader"><div class="dc_loader_spinner"></div></div>')
         $('body').append("" +
             "<link rel='stylesheet' href='//dcapi.direct-credit.ru/style.css' type='text/css'/> " +
             "<script src='//dcapi.direct-credit.ru/JsHttpRequest.js' type='text/javascript'></script> " +
@@ -58,7 +58,7 @@ if (!dcData?.error) {
                     return false
                 }
 
-                document.body.classList.add('loaded_hiding');
+                document.getElementById('dc_loader').style.display = 'block';
 
                 $.ajax({
                     url: createOrderUri,
@@ -73,16 +73,13 @@ if (!dcData?.error) {
                         birthdate: formProps["form_fields[date_rojdenija]"],
                         address: formProps["form_fields[City]"],
                         price: price,
-                        metrikaclientid: yaCounter23555653.getClientID(),
+                        metrikaclientid: typeof yaCounter2355565 !== 'undefined' ? yaCounter2355565.getClientID() : 'метрика не определена',
                         url: formProps["form_fields[url_my]"]
                     }
                 }).success(function (response) {
                     if (response.success) {
 
-                        window.setTimeout(function () {
-                            document.body.classList.add('loaded');
-                            document.body.classList.remove('loaded_hiding');
-                        }, 500);
+                        document.getElementById('dc_loader').style.display = 'none';
 
                         DCLoans(partnerID, 'orderByToken', {token: response.data.token}, function (result) {
                         });

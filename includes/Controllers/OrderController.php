@@ -54,7 +54,7 @@ class OrderController
             'price' => $request['price'],
 
             'address' => $request['address'] ?? null,
-            'birthdate' => $request['$birthdate'] ?? null,
+            'birthdate' => $request['birthdate'] ?? null,
             'metrikaClientId' => $request['metrikaclientid'] ?? null,
             'url' => $request['url'] ?? null,
             'utm' => [
@@ -310,9 +310,9 @@ class OrderController
         $phone = $order_data['phone'];
         $email = $order_data['email'];
         $creditResult = $dc_status;
-        $order = $order_data['order'];
+        $order = $order_data['order_id'];
         $codeTT = $order_data['codeTT'];
-        $name = $order_data['name'];
+        $name = $order_data['item_name'];
         $price = $order_data['price'];
         $address = $order_data['address'];
         $birthdate = $order_data['birthdate'];
